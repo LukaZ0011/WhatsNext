@@ -23,9 +23,11 @@ async def on_ready():
 async def today(ctx):
     if ctx.author == bot.user:
         return
-
-    await ctx.send(f'For Today You have: ') #eventParser.get_today() not finished yet
-
     
+    calendar = open("calendar.ics", "r")
+    eventList = eventParser.parse_ics(calendar)
+    calendar.close()
+
+    await ctx.send(f'For Today You have: \n {eventParser.formatEvents(eventParser.getTodayEvents(eventList))}')
     
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)

@@ -13,6 +13,24 @@ class CalendarEvent:
         self.title = None
         self.rrule = None
 
+def formatEvents(eventList):
+    if not eventList:
+        return "No events found."
+    
+    formatted_output = ""
+    formatted_output += "-" * 20 + "\n"
+    for event in eventList:
+        formatted_output += f"**{event.title}**\n"
+        if event.start_time and event.end_time:
+            formatted_output += f"**{event.start_time.strftime('%H:%M')} - {event.end_time.strftime('%H:%M')}**\n"
+        if event.location:
+            formatted_output += f"{event.location}\n"
+        if event.description:
+            formatted_output += f"{event.description}\n"
+        formatted_output += "-" * 20 + "\n"
+    
+    return formatted_output
+
 def expandRecurringEvent(e):
     varFREQ = None
     varWKST = None
@@ -69,7 +87,7 @@ def getTodayEvents(eventList):
             todayList.append(event)
     return todayList
 
-def printEvents(eventList):
+def printEvents(eventList): #for testing purposes
     for event in eventList:
         print(f"Title: {event.title}")
         print(f"RRule: {event.rrule}")
@@ -78,7 +96,6 @@ def printEvents(eventList):
         print(f"Location: {event.location}")
         print(f"Description: {event.description}")
         print("-" * 40)
-
 
 def parseDateTime(dateString):
     dt = datetime.strptime(dateString, "%Y%m%dT%H%M%S")
