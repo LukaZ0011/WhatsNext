@@ -123,7 +123,7 @@ def parse_ics(file):
         if line.startswith("LOCATION") and isNewEvent:
             event.location = line.split(":")[1].strip()
         if line.startswith("DESCRIPTION") and isNewEvent:
-            event.description = line.split(":")[1].strip()
+            event.description = line.split(":")[1].strip().replace("\\n", "\n")
         if line.startswith("SUMMARY") and isNewEvent:
             event.title = line.split(":")[1].strip()
         if line.startswith("END:VEVENT") and isNewEvent:
