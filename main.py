@@ -1,4 +1,6 @@
 
+from datetime import datetime
+
 class CalendarEvent:
     def __init__(self):
         self.start_time = None
@@ -8,7 +10,8 @@ class CalendarEvent:
         self.title = None
 
 def parseDateTime(dateString):
-    
+    dt = datetime.strptime(dateString, "%Y%m%dT%H%M%S")
+    return dt
 
 def parse_ics(file):
     eventList = []
@@ -18,18 +21,35 @@ def parse_ics(file):
             isNewEvent = True
             event = CalendarEvent()
         if line.startswith("DTSTART;TZID") and isNewEvent:
-            
-        elif line.startswith("END:VEVENT") and isNewEvent:
+            event.start_time = parseDateTime(line.split(":")[1].strip())
+        if line.startswith("DTEND;TZID") and isNewEvent:
+            event.end_time = parseDateTime(line.split(":")[1].strip())
+        if line.startswith("LOCATION") and isNewEvent:
+            event.location = line.split(":")[1].strip()
+        if line.startswith("DESCRIPTION") and isNewEvent:
+            event.description = line.split(":")[1].strip()
+        if line.startswith("SUMMARY") and isNewEvent:
+            event.title = line.split(":")[1].strip()
+        if line.startswith("END:VEVENT") and isNewEvent:
             isNewEvent = False
+            eventList.append(event)
+    return eventList
 
                 
         
 
 def main():
     calendar = open("calendar.ics", "r")
-    parse_ics(calendar)
+    eventList = parse_ics(calendar)
     calendar.close()
-    event = CalendarEvent()
+    for event in eventList:
+        print(f"Title: {event.title}")
+        print(f"Start Time: {event.start_time}")
+        print(f"End Time: {event.end_time}")
+        print(f"Location: {event.location}")
+        print(f"Description: {event.description}")
+        print("-" * 40)
+
 
 
 if __name__ == "__main__":
