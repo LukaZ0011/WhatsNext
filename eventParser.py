@@ -3,6 +3,8 @@ from datetime import datetime
 from datetime import date
 from datetime import timedelta
 import copy
+from table2ascii import table2ascii as t2a, PresetStyle, Alignment
+
 
 class CalendarEvent:
     def __init__(self):
@@ -14,22 +16,26 @@ class CalendarEvent:
         self.rrule = None
 
 def formatEvents(eventList):
-    if not eventList:
-        return "No events found."
+    body = []
     
-    formatted_output = ""
-    formatted_output += "-" * 20 + "\n"
-    for event in eventList:
-        formatted_output += f"**{event.title}**\n"
-        if event.start_time and event.end_time:
-            formatted_output += f"**{event.start_time.strftime('%H:%M')} - {event.end_time.strftime('%H:%M')}**\n"
-        if event.location:
-            formatted_output += f"{event.location}\n"
-        if event.description:
-            formatted_output += f"{event.description}\n"
-        formatted_output += "-" * 20 + "\n"
+    for i, event in enumerate(eventList):
+        # Add event title row
+        body.append([event.title])
+        
+        # Combine time, location, and description into one cell
+        time_str = f"{event.start_time.strftime('%H:%M')} - {event.end_time.strftime('%H:%M')}"
+        combined_details = f"{time_str}\n{event.location}\n{event.description}"
+        body.append([combined_details])
     
-    return formatted_output
+    # Create the table without header and separators
+    table = t2a(
+        body=body,
+        style=PresetStyle.double_thin_box,
+        cell_padding=2,
+        alignments=[Alignment.CENTER]
+    )
+    
+    return f"```\n{table}\n```"
 
 def expandRecurringEvent(e):
     varFREQ = None
