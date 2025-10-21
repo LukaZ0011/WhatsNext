@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from datetime import date
 
 class CalendarEvent:
     def __init__(self):
@@ -8,6 +9,24 @@ class CalendarEvent:
         self.description = None
         self.location = None
         self.title = None
+
+def getTodayEvents(eventList):
+    todayList = []
+    today = date.today()
+    for event in eventList:
+        if event.start_time.date() == today:
+            todayList.append(event)
+    return todayList
+
+def printEvents(eventList):
+    for event in eventList:
+        print(f"Title: {event.title}")
+        print(f"Start Time: {event.start_time}")
+        print(f"End Time: {event.end_time}")
+        print(f"Location: {event.location}")
+        print(f"Description: {event.description}")
+        print("-" * 40)
+
 
 def parseDateTime(dateString):
     dt = datetime.strptime(dateString, "%Y%m%dT%H%M%S")
@@ -42,14 +61,9 @@ def main():
     calendar = open("calendar.ics", "r")
     eventList = parse_ics(calendar)
     calendar.close()
-    for event in eventList:
-        print(f"Title: {event.title}")
-        print(f"Start Time: {event.start_time}")
-        print(f"End Time: {event.end_time}")
-        print(f"Location: {event.location}")
-        print(f"Description: {event.description}")
-        print("-" * 40)
-
+    today = getTodayEvents(eventList)
+    printEvents(today)
+    
 
 
 if __name__ == "__main__":
