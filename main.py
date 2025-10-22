@@ -4,6 +4,9 @@ import logging
 from dotenv import load_dotenv
 import os
 import eventParser
+import datetime
+
+
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')

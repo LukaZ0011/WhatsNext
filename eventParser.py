@@ -5,7 +5,6 @@ from datetime import timedelta
 import copy
 from table2ascii import table2ascii as t2a, PresetStyle, Alignment
 
-
 class CalendarEvent:
     def __init__(self):
         self.start_time = None
@@ -15,12 +14,26 @@ class CalendarEvent:
         self.title = None
         self.rrule = None
 
+def insert_newline(text):
+    max_len = 20
+    words = text.split()
+    
+    if len(text) <= max_len or len(words) <= 1:
+        return text
+    
+    # Split roughly in the middle by word count
+    mid = len(words) // 2
+    if mid == 0:
+        mid = 1
+        
+    return " ".join(words[:mid]) + "\n" + " ".join(words[mid:])
+
 def formatEvents(eventList):
     body = []
     
     for i, event in enumerate(eventList):
         # Add event title row
-        body.append([event.title])
+        body.append([insert_newline(event.title)])
         
         # Combine time, location, and description into one cell
         time_str = f"{event.start_time.strftime('%H:%M')} - {event.end_time.strftime('%H:%M')}"
@@ -81,13 +94,11 @@ def expandRecurringEvent(e):
         elif varFREQ == "DAILY":
             current_start += timedelta(days=varINTERVAL)
             current_end += timedelta(days=varINTERVAL)
-            
-
     return recurringEvents
 
 def getTodayEvents(eventList):
     todayList = []
-    today = date.today() + timedelta(days=0)
+    today = date.today() + timedelta(days=2)
     for event in eventList:
         if event.start_time.date() == today:
             todayList.append(event)
@@ -128,20 +139,12 @@ def parse_ics(file):
             event.title = line.split(":")[1].strip()
         if line.startswith("END:VEVENT") and isNewEvent:
             isNewEvent = False
-            if event.rrule:
-                eventList.extend(expandRecurringEvent(event))
+            # Check if description contains "G1" and exclude if it does
+            if event.description and "G2" in event.description:
+                pass  # Skip this event
             else:
-                eventList.append(event)
+                if event.rrule:
+                    eventList.extend(expandRecurringEvent(event))
+                else:
+                    eventList.append(event)
     return eventList
-
-def main():
-    calendar = open("calendar.ics", "r")
-    eventList = parse_ics(calendar)
-    calendar.close()
-    today = getTodayEvents(eventList)
-    printEvents(today)
-    
-
-
-if __name__ == "__main__":
-    main()
