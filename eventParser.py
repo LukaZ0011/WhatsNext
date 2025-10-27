@@ -29,9 +29,12 @@ def insert_newline(text):
     return " ".join(words[:mid]) + "\n" + " ".join(words[mid:])
 
 def formatEvents(eventList):
-    body = []
+    tables = []
     
-    for i, event in enumerate(eventList):
+    for event in eventList:
+        # Create a separate table for each event
+        body = []
+        
         # Add event title row
         body.append([insert_newline(event.title)])
         
@@ -39,16 +42,19 @@ def formatEvents(eventList):
         time_str = f"{event.start_time.strftime('%H:%M')} - {event.end_time.strftime('%H:%M')}"
         combined_details = f"{time_str}\n{event.location}\n{event.description}"
         body.append([combined_details])
+        
+        # Create individual table for this event
+        table = t2a(
+            body=body,
+            style=PresetStyle.double_thin_box,
+            cell_padding=2,
+            alignments=[Alignment.CENTER]
+        )
+        
+        tables.append(f"```\n{table}\n```")
     
-    # Create the table without header and separators
-    table = t2a(
-        body=body,
-        style=PresetStyle.double_thin_box,
-        cell_padding=2,
-        alignments=[Alignment.CENTER]
-    )
-    
-    return f"```\n{table}\n```"
+    # Join all tables with a newline between them
+    return "\n".join(tables)
 
 def expandRecurringEvent(e):
     varFREQ = None
@@ -96,9 +102,9 @@ def expandRecurringEvent(e):
             current_end += timedelta(days=varINTERVAL)
     return recurringEvents
 
-def getTodayEvents(eventList):
+def getEventsInDay(eventList, day): #0 is today, 1 is tomorrow, 2 is 2 days after today and so on...
     todayList = []
-    today = date.today() + timedelta(days=2)
+    today = date.today() + timedelta(days=day)
     for event in eventList:
         if event.start_time.date() == today:
             todayList.append(event)
